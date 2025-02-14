@@ -1,3 +1,5 @@
+Note: This uses python, and for me it works in pycharm, I'd reccomend using that or just anything else that can run python!
+
 This is the pichusymbolizers code made by me.
 Current Version: 0.1.3
 
