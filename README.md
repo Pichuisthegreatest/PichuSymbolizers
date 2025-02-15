@@ -1,3 +1,5 @@
+IMPORTANT: This code uses a save function, which will use a save folder. When opening it in whatever software, make a folder named "saves"! Failure to do so may result in bugs / glitches / crashes!!!
+
 Note: This uses python, and for me it works in pycharm, I'd reccomend using that or just anything else that can run python!
 
 This is the pichusymbolizers code made by me.
