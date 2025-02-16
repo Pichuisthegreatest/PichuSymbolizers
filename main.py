@@ -20,7 +20,7 @@ up2multincrease = 1
 milestoneincrease = 1
 alphanizemulti = 1
 alphanizebetamulti = 1
-deltabooster = 1
+gammabooster = 1
 challengerequirement = 1
 challengecompletions = 0
 challenge2requirement = 1
@@ -28,7 +28,7 @@ challenge2completions = 0
 incre = (baseincrease * up2multincrease)
 incre2 = (milestoneincrease * alphanizemulti)
 incre3 = incre * incre2
-incre4 = incre3 * deltabooster
+incre4 = incre3 * gammabooster
 increase = incre4 * ((2.5 * challengecompletions) + 1)
 basemaxalpha = 100
 betamaxmulti = 1
@@ -46,6 +46,7 @@ betagenerationunlocked = False
 challenge2active = False
 challengeunlocked = False
 deltaunlocked = False
+deltaresetcomplete = False
 # -SIDE VARS (E)
 acost1 = 10
 a1buyamount = 0
@@ -63,6 +64,8 @@ g1buyamount = 0
 gupg2 = 100
 gupg3 = 1000
 g3buyamount = 0
+dupg1 = 1
+d1buyamount = 0
 # -
 # -
 progress_bar = ttk.Progressbar(window,
@@ -81,7 +84,7 @@ alpha_label.configure(bg="ghostwhite")
 def update():
     global acost1, a1buyamount, alpha, max_alpha, increase, rate, beta, betaify, resetbeta, milestoneamount
     global betaboost, betagenboost, betamaxboost, basemaxalpha, betamaxmulti, milestonemaxmulti, milestoneincrease, alphanizebetamulti, alphanizemulti, alphanizebetamulti
-    global gammaifyunlocked, resetgamma, gamma, challengecompletions, challengerequirement, challengeunlocked, incre1, incre2, incre3, incre4
+    global gammaifyunlocked, resetgamma, gamma, challengecompletions, challengerequirement, challengeunlocked, incre1, incre2, incre3, incre4, deltaunlocked
 
     while True:
         # Recalculation
@@ -93,7 +96,7 @@ def update():
         incre = (baseincrease * up2multincrease)
         incre2 = (milestoneincrease * alphanizemulti)
         incre3 = incre * incre2
-        incre4 = incre3 * deltabooster
+        incre4 = incre3 * gammabooster
         increase = incre4 * ((2.5 * challengecompletions) + 1)
 
         # UI
@@ -148,17 +151,24 @@ def update():
             gammaup1label.configure(text=f"{gupg1} γ")
             gammaup1button.configure(text=f"Buy ({g1buyamount})")
             gammaupg2label.configure(text=f"{gupg2} γ")
-            gammaup2button.configure(text=f"Buy ({challengecompletions}) ({challengeactive})", command=gammaupg2)
+            gammaup2button.configure(text=f"Try ({challengecompletions}) ({challengeactive})", command=gammaupg2)
             gammaupg2explain.configure(text=f"Commits a gamma reset. Getting increasing amount of beta increases beta.")
         if challengecompletions >= 10 and not challengeunlocked:
             gammaupg3label.configure(text=f"{gupg3} γ")
-            gammaup3button.configure(text=f"Buy ({g3buyamount})")
+            gammaup3button.configure(text=f"Try ({g3buyamount}) ({challenge2active})")
             gammaupg3explain.configure(text=f"Unlock inner potential...?")
             challengeunlocked = True
         if challengeunlocked:
             gammaupg3label.configure(text=f"{gupg3} γ")
             gammaup3button.configure(text=f"Buy ({g3buyamount})")
             gammaupg3explain.configure(text=f"Unlock inner potential...?")
+        if gamma >= 3000 and challenge2completions >= 0:
+            print("OUTPUT: Darkness seeps around you...")
+            print("OUTPUT: DELTAIFY UNLOCKED?!?!")
+            deltaunlocked = True
+        if deltaunlocked:
+            deltalabel.configure(text="You need 3000 gamma and a challenge 2 completion to prove yourself worthy.")
+            deltaresetbutton.configure(text=f"Accept it. {resetdelta} δ awaits...", command= deltareset)
         time.sleep(0.25)
 
 
@@ -179,7 +189,7 @@ def update_alpha():
         progress_bar["value"] = alpha
         alpha_label.config(
             text=
-            f"Alpha: {alpha:.1f}/{max_alpha} , +{increase:.1f}α / {rate}s , Beta: {beta}β , {resetbeta}β/reset"
+            f"Alpha: {alpha}/{max_alpha} , +{increase}α / {rate}s , Beta: {beta}β , {resetbeta}β/reset"
         )
 
         window.update()
@@ -418,9 +428,9 @@ alphanizeboostlabel.configure(bg="ghostwhite")
 
 
 def alphanizemachine():
-    global alphanizebetamulti, alphanizemulti, alphapower, deltabooster
+    global alphanizebetamulti, alphanizemulti, alphapower, gammabooster
     while alphanizerunlocked:
-        alphapower += (0.1 * deltabooster)
+        alphapower += (0.1 * gammabooster)
         alphanizebetamulti = 1 + (round(math.log2(math.sqrt(alphapower)), 2))
         alphanizemulti = 1 + (round(math.log2(math.sqrt(alphapower)), 2))
         time.sleep(0.1)
@@ -528,6 +538,7 @@ def gammareset():
         max_alpha = alpmax * milestonemaxmulti
         alphapower = 1
         alphanizerunlocked = False
+        alpherupglabel.configure(text=f"Unlocks the alphanizer, which generates boosts / second. ({alphanizerunlocked})")
         alphanizemulti = 1
         alphanizebetamulti = 1
         milestoneamount = 0
@@ -550,12 +561,12 @@ def gammareset():
 
 # -GAMMA UPGRADE 1 START
 def gammaupg1():
-    global gupg1, gamma, rate, g1buyamount, deltabooster
+    global gupg1, gamma, rate, g1buyamount, gammabooster
     if gamma >= gupg1:
         gamma -= gupg1
         gupg1 = round(gupg1 * 1.5, 2)
         rate = round((rate * 0.9), 2)
-        deltabooster += 1.5
+        gammabooster += 1.5
         g1buyamount += 1
     else:
         print("WARN: Not enough gamma!")
@@ -635,9 +646,66 @@ def gammaupg3():
 
 # -DELTAIFY, THE NEW RESET LAYER!!
 
+deltalabel = tk.Label(new_window, text=f"...unworthy...")
+deltalabel.grid(column=0,row=40)
+deltalabel.configure(bg="#C72EC7")
+
+deltaresetbutton = tk.Button(new_window, text=f"???", command= lambda: None)
+deltaresetbutton.grid(column=0,row=50)
+deltaresetbutton.configure(bg="ghostwhite")
+
+def deltaresetstats():
+    global alpha, beta, gamma, resetgamma, baseincrease, up2multincrease, milestoneincrease, alphanizemulti, alphanizebetamulti, gammabooster, challengerequirement
+    global challengecompletions, challenge2requirement, challenge2completions, incre, incre2, incre3, incre4, increase, basemaxalpha, betamaxmulti, betamaxboost
+    global milestonemaxmulti, alpmax, max_alpha, rate, alphapowerbooster, alphapower, challengeactive, alphanizerunlocked, betagenerationunlocked, challenge2active
+    global challengeunlocked
+    alpha = 1
+    beta = 0
+    gamma = 0
+    resetgamma = 0
+    baseincrease = 1
+    up2multincrease = 1
+    milestoneincrease = 1
+    alphanizemulti = 1
+    alphanizebetamulti = 1
+    gammabooster = 1
+    challengerequirement = 1
+    challengecompletions = 0
+    challenge2requirement = 1
+    challenge2completions = 0
+    incre = (baseincrease * up2multincrease)
+    incre2 = (milestoneincrease * alphanizemulti)
+    incre3 = incre * incre2
+    incre4 = incre3 * gammabooster
+    increase = incre4 * ((2.5 * challengecompletions) + 1)
+    basemaxalpha = 100
+    betamaxmulti = 1
+    betamaxboost = 1
+    milestonemaxmulti = 1
+    alpmax = (basemaxalpha * betamaxmulti)
+    max_alpha = alpmax * milestonemaxmulti
+    rate = 1
+    alphapowerbooster = 1
+    alphapower = 0
+    challengeactive = False
+    alphanizerunlocked = False
+    betagenerationunlocked = False
+    challenge2active = False
+    challengeunlocked = False
+
 def deltareset():
-    global gamma, beta, alpha, delta, resetdelta, max_alpha
-    resetdelta = (1*deltaamount)
+    global gamma, beta, alpha, delta, resetdelta, max_alpha, deltaresetcomplete
+    if gamma >= 3000 and challenge2completions != 0:
+      resetdelta += (1*deltaamount)
+      print("OUTPUT: Darkness is among you...")
+      deltaresetcomplete = True
+      deltaresetstats()
+    else:
+        print("WARN: The darkness perceives you as unworthy...")
+        print("A whisper stands out:  '3000 gamma... complete challenge 2...' ")
+
+def deltaupg1():
+    global delta, dupg1, d1buyamount,incre4
 
 # -DELTAIFY, THE NEW RESET LAYER ENDS...
 # THREADS 2 YAY START
@@ -668,7 +736,7 @@ def save_variables_to_file():
         return
 
     variables = [
-        f"alpha={alpha}", f"beta={beta}", f"gamma={gamma}",
+        f"alpha={alpha}", f"beta={beta}", f"gamma={gamma}", f"delta={delta}",
         f"basemaxalpha={basemaxalpha}", f"betamaxmulti={betamaxmulti}",
         f"acost1={acost1}", f"acost2={acost2}", f"bcost1={bcost1}",
         f"bcost2={bcost2}", f"a1buyamount={a1buyamount}",
@@ -677,7 +745,7 @@ def save_variables_to_file():
         f"baseincrease={baseincrease}", f"up2multincrease={up2multincrease}",
         f"betamaxboost={betamaxboost}", f"milestoneincrease={milestoneincrease}",
         f"alphanizemulti={alphanizemulti}", f"alphanizebetamulti={alphanizebetamulti}",
-        f"deltabooster={deltabooster}", f"challengerequirement={challengerequirement}",
+        f"gammabooster={gammabooster}", f"challengerequirement={challengerequirement}",
         f"challengecompletions={challengecompletions}", f"challenge2completions={challenge2completions}",
         f"challenge2requirement={challenge2requirement}", f"incre={incre}",
         f"incre2={incre2}", f"incre3={incre3}", f"incre4={incre4}",
@@ -686,7 +754,8 @@ def save_variables_to_file():
         f"alphapowerbooster={alphapowerbooster}", f"alphapower={alphapower}",
         f"challengeactive={challengeactive}", f"alphanizerunlocked={alphanizerunlocked}",
         f"gammaifyunlocked={gammaifyunlocked}", f"betagenerationunlocked={betagenerationunlocked}",
-        f"challengeunlocked={challengeunlocked}", f"deltaunlocked={deltaunlocked}"
+        f"challengeunlocked={challengeunlocked}", f"deltaunlocked={deltaunlocked}",
+        f"deltaresetcomplete={deltaresetcomplete}"
     ]
 
     with open(f"saves/{filenamechoice}.txt", 'w') as f:
@@ -700,7 +769,7 @@ def retrieve_variables_from_file():
         print("WARN: No filename specified")
         return
     global alpha, beta, gamma, baseincrease, up2multincrease, milestoneincrease
-    global alphanizemulti, alphanizebetamulti, deltabooster, challengerequirement
+    global alphanizemulti, alphanizebetamulti, gammabooster, challengerequirement
     global challengecompletions, incre, incre2, incre3, incre4, increase
     global milestonemaxmulti, alpmax, max_alpha, rate, alphapowerbooster
     global alphapower, challengeactive, alphanizerunlocked, gammaifyunlocked
