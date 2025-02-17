@@ -3,6 +3,7 @@ from tkinter import Button, Label, ttk, Entry
 import threading
 import time
 import math
+import base64
 
 window = tk.Tk()
 window.title("Pichu symbolizers")
@@ -25,11 +26,15 @@ challengerequirement = 1
 challengecompletions = 0
 challenge2requirement = 1
 challenge2completions = 0
+betagenboost = round(math.log10((beta + 1) * 10), 2)
+betamaxboost = round(math.log10((beta + 1) * 10), 2)
+betamaxmulti = round(betamaxboost, 2)
 incre = (baseincrease * up2multincrease)
 incre2 = (milestoneincrease * alphanizemulti)
 incre3 = incre * incre2
 incre4 = incre3 * gammabooster
-increase = incre4 * ((2.5 * challengecompletions) + 1)
+incre5 = incre4 * betagenboost
+increase = incre5 * ((2.5 * challengecompletions) + 1)
 basemaxalpha = 100
 betamaxmulti = 1
 milestonemaxmulti = 1
@@ -84,7 +89,7 @@ alpha_label.configure(bg="ghostwhite")
 def update():
     global acost1, a1buyamount, alpha, max_alpha, increase, rate, beta, betaify, resetbeta, milestoneamount
     global betaboost, betagenboost, betamaxboost, basemaxalpha, betamaxmulti, milestonemaxmulti, milestoneincrease, alphanizebetamulti, alphanizemulti, alphanizebetamulti
-    global gammaifyunlocked, resetgamma, gamma, challengecompletions, challengerequirement, challengeunlocked, incre1, incre2, incre3, incre4, deltaunlocked
+    global gammaifyunlocked, resetgamma, gamma, challengecompletions, challengerequirement, challengeunlocked, incre1, incre2, incre3, incre4, deltaunlocked, incre5
 
     while True:
         # Recalculation
@@ -93,11 +98,12 @@ def update():
         betamaxmulti = round(betamaxboost, 2)
 
         max_alpha = math.floor(basemaxalpha * betamaxmulti * milestonemaxmulti)
-        incre = (baseincrease * up2multincrease)
-        incre2 = (milestoneincrease * alphanizemulti)
-        incre3 = incre * incre2
-        incre4 = incre3 * gammabooster
-        increase = incre4 * ((2.5 * challengecompletions) + 1)
+        incre = round((baseincrease * up2multincrease), 2)
+        incre2 = round((milestoneincrease * alphanizemulti), 2)
+        incre3 = round(incre * incre2,2)
+        incre4 = round(incre3 * gammabooster,2)
+        incre5 = round(incre4 * betagenboost,2)
+        increase = round((incre5 * ((2.5 * challengecompletions) + 1)), 2)
 
         # UI
         milestonelabel.configure(
@@ -128,7 +134,7 @@ def update():
             (max_alpha) / 3)) * (1 + alphanizebetamulti)) *
                                ((0.25 * challengecompletions) + 1))
         resetgamma = round(
-            (math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha), 2)
+            (((math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha)) / 10), 2)
         if alphanizerunlocked and not alphanizer_thread.is_alive():
             alphanizer_thread.start()
             pass
@@ -521,7 +527,7 @@ def gammareset():
     global betamaxboost, betagenboost, rate, alphapower, alphanizerunlocked, milestoneincrease, milestonemaxmulti, milestoneamount, betagenerationunlocked, alphanizebetamulti, alphanizemulti
     if beta >= 3000:
         resetgamma = round(
-            (math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha), 2)
+        (((math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha)) / 10), 2)
         gamma += resetgamma
         print(f"OUTPUT: GAMMA RESET PERFORMED FOR {resetgamma}")
         baseincrease = 1
@@ -758,10 +764,15 @@ def save_variables_to_file():
         f"deltaresetcomplete={deltaresetcomplete}"
     ]
 
+    content = ""
+    for i in range(0, len(variables), 10):
+        chunk = variables[i:i + 10]
+        content += "{" + ",".join(chunk) + "}\n"
+    
+    encoded_content = base64.b64encode(content.encode()).decode()
+    
     with open(f"saves/{filenamechoice}.txt", 'w') as f:
-        for i in range(0, len(variables), 10):
-            chunk = variables[i:i + 10]
-            f.write("{" + ",".join(chunk) + "}\n")
+        f.write(encoded_content)
 
 
 def retrieve_variables_from_file():
@@ -777,7 +788,9 @@ def retrieve_variables_from_file():
     global betamaxboost, betamaxmulti, basemaxalpha, challengeunlocked, challenge2requirement, challenge2completions, deltaunlocked
 
     with open(f"saves/{filenamechoice}.txt", 'r') as f:
-        lines = f.readlines()
+        encoded_content = f.read()
+        decoded_content = base64.b64decode(encoded_content).decode()
+        lines = decoded_content.split('\n')
         for line in lines:
             variables = line.strip()[1:-1].split(',')  # Remove { } and split
             for var in variables:
