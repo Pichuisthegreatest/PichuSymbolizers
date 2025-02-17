@@ -134,7 +134,7 @@ def update():
             (max_alpha) / 3)) * (1 + alphanizebetamulti)) *
                                ((0.25 * challengecompletions) + 1))
         resetgamma = round(
-            (((math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha)) / 10), 2)
+            (((math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha)) / 100), 2)
         if alphanizerunlocked and not alphanizer_thread.is_alive():
             alphanizer_thread.start()
             pass
@@ -527,7 +527,7 @@ def gammareset():
     global betamaxboost, betagenboost, rate, alphapower, alphanizerunlocked, milestoneincrease, milestonemaxmulti, milestoneamount, betagenerationunlocked, alphanizebetamulti, alphanizemulti
     if beta >= 3000:
         resetgamma = round(
-        (((math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha)) / 10), 2)
+        (((math.sqrt(beta) * (alpha / 1e4)) * ((alpha * 1.2) / max_alpha)) / 100), 2)
         gamma += resetgamma
         print(f"OUTPUT: GAMMA RESET PERFORMED FOR {resetgamma}")
         baseincrease = 1
