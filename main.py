@@ -825,7 +825,7 @@ def retrieve_variables_from_file():
             gammaup1label.configure(text=f"{gupg1} γ")
             gammaup1button.configure(text=f"Buy ({g1buyamount})", command=gammaupg1)
             gammaup1explain.configure(
-                text="Increases a delta multiplier by + 1.5x, boosts alpha and alpha power and lowers rate.")
+                text="Increases a gamma multiplier by + 1.5x, boosts alpha and alpha power and lowers rate.")
 
 
 def savecheckr():
