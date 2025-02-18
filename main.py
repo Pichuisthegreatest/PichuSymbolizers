@@ -44,6 +44,10 @@ rate = 1
 alphapowerbooster = 1
 alphapower = 0
 deltaamount = 0
+#-radiation-delta
+radiationlevel = 0
+sievert = 0
+#-booleans omg
 challengeactive = False
 alphanizerunlocked = False
 gammaifyunlocked = False
@@ -70,7 +74,6 @@ gupg2 = 100
 gupg3 = 1000
 g3buyamount = 0
 dupg1 = 1
-d1buyamount = 0
 # -
 # -
 progress_bar = ttk.Progressbar(window,
@@ -158,22 +161,22 @@ def update():
             gammaup1button.configure(text=f"Buy ({g1buyamount})")
             gammaupg2label.configure(text=f"{gupg2} γ")
             gammaup2button.configure(text=f"Try ({challengecompletions}) ({challengeactive})", command=gammaupg2)
-            gammaupg2explain.configure(text=f"Commits a gamma reset. Getting increasing amount of beta increases beta.")
+            gammaupg2explain.configure(text="Commits a gamma reset.\n Getting increasing amount of beta increases beta.")
         if challengecompletions >= 10 and not challengeunlocked:
             gammaupg3label.configure(text=f"{gupg3} γ")
             gammaup3button.configure(text=f"Try ({g3buyamount}) ({challenge2active})")
-            gammaupg3explain.configure(text=f"Unlock inner potential...?")
+            gammaupg3explain.configure(text="Unlock inner potential...?")
             challengeunlocked = True
         if challengeunlocked:
             gammaupg3label.configure(text=f"{gupg3} γ")
             gammaup3button.configure(text=f"Buy ({g3buyamount})")
-            gammaupg3explain.configure(text=f"Unlock inner potential...?")
-        if gamma >= 3000 and challenge2completions >= 0:
+            gammaupg3explain.configure(text="Unlock inner potential...?")
+        if gamma >= 3000 and challenge2completions >= 0 and not deltaunlocked:
             print("OUTPUT: Darkness seeps around you...")
             print("OUTPUT: DELTAIFY UNLOCKED?!?!")
             deltaunlocked = True
         if deltaunlocked:
-            deltalabel.configure(text="You need 3000 gamma and a challenge 2 completion to prove yourself worthy.")
+            deltalabel.configure(text="To prove yourself worthy...\n 3000 gamma\n challenge 2 completion.")
             deltaresetbutton.configure(text=f"Accept it. {resetdelta} δ awaits...", command= deltareset)
         time.sleep(0.25)
 
@@ -702,7 +705,7 @@ def deltaresetstats():
 def deltareset():
     global gamma, beta, alpha, delta, resetdelta, max_alpha, deltaresetcomplete
     if gamma >= 3000 and challenge2completions != 0:
-      resetdelta += (1*deltaamount)
+      resetdelta += (1*(1+deltaamount))
       print("OUTPUT: Darkness is among you...")
       deltaresetcomplete = True
       deltaresetstats()
@@ -711,7 +714,10 @@ def deltareset():
         print("A whisper stands out:  '3000 gamma... complete challenge 2...' ")
 
 def deltaupg1():
-    global delta, dupg1, d1buyamount,incre4
+    global delta, dupg1,radiationlevel,sievert
+    if delta >= dupg1:
+        delta -= dupg1
+        dupg1 = math.inf
 
 # -DELTAIFY, THE NEW RESET LAYER ENDS...
 # THREADS 2 YAY START
@@ -768,11 +774,13 @@ def save_variables_to_file():
     for i in range(0, len(variables), 10):
         chunk = variables[i:i + 10]
         content += "{" + ",".join(chunk) + "}\n"
-    
+
     encoded_content = base64.b64encode(content.encode()).decode()
-    
+
     with open(f"saves/{filenamechoice}.txt", 'w') as f:
+        f.write("StartSaveFile\n")
         f.write(encoded_content)
+        f.write("\nEndSaveFile")
 
 
 def retrieve_variables_from_file():
@@ -788,11 +796,12 @@ def retrieve_variables_from_file():
     global betamaxboost, betamaxmulti, basemaxalpha, challengeunlocked, challenge2requirement, challenge2completions, deltaunlocked
 
     with open(f"saves/{filenamechoice}.txt", 'r') as f:
-        encoded_content = f.read()
+        lines = f.readlines()
+        encoded_content = lines[1].strip()  #skip start and end of file things
         decoded_content = base64.b64decode(encoded_content).decode()
         lines = decoded_content.split('\n')
         for line in lines:
-            variables = line.strip()[1:-1].split(',')  # Remove { } and split
+            variables = line.strip()[1:-1].split(',')  
             for var in variables:
                 if not var: continue
                 name, value = var.strip().split('=')
@@ -808,7 +817,6 @@ def retrieve_variables_from_file():
                         continue
                 globals()[name] = value
 
-        # Update UI elements after loading
         progress_bar.configure(maximum=max_alpha)
         alpha_label.config(
             text=
@@ -825,7 +833,7 @@ def retrieve_variables_from_file():
         alphanizeboostlabel.configure(
             text=f"Alphanizer boosts both multi by {alphanizemulti:.1f}")
 
-        # Start threads based on boolean states
+        # Start threads based on boolean states - we love you booleans
         if betagenerationunlocked and not betagenerationthread.is_alive():
             betagenerationthread.start()
         if alphanizerunlocked and not alphanizer_thread.is_alive():
