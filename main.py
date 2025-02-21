@@ -640,7 +640,7 @@ def gammaupg3():
             challenge2active = True
             gammareset()
         if challenge2active:
-            if challenge2requirement >= gamma:
+            if challenge2requirement <= gamma:
                 print("OUTPUT: Well done!")
                 deltaunlocked = True
             else:
