@@ -1,14 +1,17 @@
+import time
+import warnings
+import random
+import math
+import threading
+import base64
 import tkinter as tk
 from tkinter import Button, Label, ttk, Entry
-import threading
-import time
-import math
 
 window = tk.Tk()
 window.title("Pichu symbolizers")
 window.geometry('650x650')
 window.configure(bg="#01d9e9")
-# -MAIN VARS (IMPORTANT)
+
 alpha = 1
 beta = 0
 gamma = 0
@@ -53,7 +56,7 @@ challengeunlocked = False
 deltaunlocked = False
 deltaresetcomplete = False
 deltaupg1done = False
-# -SIDE VARS (E)
+
 acost1 = 10
 a1buyamount = 0
 acost2 = 100
@@ -70,8 +73,7 @@ gupg3 = 1000
 g3buyamount = 0
 dupg1 = 1
 d1buyamount = 0
-# -
-# -
+
 progress_bar = ttk.Progressbar(window,
                                orient="horizontal",
                                length=300,
@@ -83,15 +85,13 @@ alpha_label = tk.Label(window, text=f"Alpha: {alpha}/{max_alpha}")
 alpha_label.grid(row=1, column=0, padx=10, pady=10)
 alpha_label.configure(bg="ghostwhite")
 
-
-# -SCREEN UPDATE START
 def update():
     global acost1, a1buyamount, alpha, max_alpha, increase, rate, beta, betaify, resetbeta, milestoneamount
     global betaboost, betagenboost, betamaxboost, basemaxalpha, betamaxmulti, milestonemaxmulti, milestoneincrease, alphanizebetamulti, alphanizemulti, alphanizebetamulti
     global gammaifyunlocked, resetgamma, gamma, challengecompletions, challengerequirement, challengeunlocked, incre1, incre2, incre3, incre4, deltaunlocked, deltaalphabooster, incre5, deltabgbooster
 
     while True:
-        # Recalculation
+
         betagenboost = round(math.log10((beta + 1) * 10), 2)
         betamaxboost = round(math.log10((beta + 1) * 10), 2)
         betamaxmulti = round(betamaxboost, 2)
@@ -104,7 +104,6 @@ def update():
         incre5 = incre4 * deltaalphabooster
         increase = incre5 * ((2.5 * challengecompletions) + 1)
 
-        # UI
         milestonelabel.configure(
             text=
             f"Your milestone boosts: {milestoneincrease}x α,  {milestonemaxmulti}x max α"
@@ -127,7 +126,6 @@ def update():
         alphanizeboostlabel.configure(
             text=f"Alphanizer boosts both multi by {alphanizemulti}")
         bupg1.configure(text=str(bcost1) + " β")
-        # RESET STUFF LOL
 
         resetbeta = math.floor((((math.log10(alpha + 1) * math.log2(
             (max_alpha) / 3)) * (1 + alphanizebetamulti)) *
@@ -137,7 +135,7 @@ def update():
         if alphanizerunlocked and not alphanizer_thread.is_alive():
             alphanizer_thread.start()
             pass
-        # UNLOCK GAMMA N GAMMA STUFF
+
         if beta >= 3000 and not gammaifyunlocked:
             print("OUTPUT: GAMMAIFY UNLOCKED!!!")
             new_window.title("Gammaify!")
@@ -176,11 +174,6 @@ def update():
             deltaresetbutton.configure(text=f"Accept it. {resetdelta} δ awaits...", command= deltareset)
         time.sleep(0.25)
 
-
-# -SCREEN UPDATE END
-
-
-# -ALPHA UPDATE FUNCTION START
 def update_alpha():
     global alpha, increase, rate, softcapmulti, max_alpha
 
@@ -200,11 +193,6 @@ def update_alpha():
         window.update()
         time.sleep(rate)
 
-
-# -ALPHA UPDATE FUNCTION END
-
-
-# -ALPHA UPGRADE 1 START
 def alphaupgrade1():
     global alpha, baseincrease, acost1, a1buyamount
     if alpha >= acost1:
@@ -214,7 +202,6 @@ def alphaupgrade1():
         a1buyamount += 1
     else:
         print("WARN: Not enough alpha!")
-
 
 aupg1 = Label(window, text=str(acost1) + " α")
 aupg1.grid(column=0, row=10)
@@ -229,11 +216,6 @@ doubleup = Button(window,
                   command=alphaupgrade1)
 doubleup.grid(column=10, row=10)
 
-
-# -ALPHA UPGRADE 1 END
-
-
-# -ALPHA UPGRADE 2 START
 def alphaupgrade2():
     global alpha, basemaxalpha, acost2, a2buyamount, max_alpha, progress_bar, up2multincrease
     if a2buyamount == 10:
@@ -251,7 +233,6 @@ def alphaupgrade2():
     else:
         print("WARN: Not enough alpha!")
 
-
 aupg2 = Label(window, text=str(acost2) + " α")
 aupg2.grid(column=0, row=20)
 aupg2.configure(bg="ghostwhite")
@@ -263,11 +244,6 @@ increasemax = Button(window,
                      command=alphaupgrade2)
 increasemax.grid(column=10, row=20)
 
-
-# -ALPHA UPGRADE 2 END
-
-
-# -ALPHA UPGRADE 3 START
 def betaresetcommand():
     global beta, alpha, max_alpha, resetbeta, a1buyamount, a2buyamount, acost1, acost2, alpmax
     global betagenboost, betamaxboost, up2multincrease, baseincrease, increase, rate, basemaxalpha, milestonemaxmulti
@@ -302,7 +278,6 @@ def betaresetcommand():
     else:
         print("WARN: Alpha is not high enough to create Beta.")
 
-
 atob = Label(window, text=str(betaify) + " α")
 atob.grid(column=0, row=40)
 atob.configure(bg="ghostwhite")
@@ -323,15 +298,10 @@ betaboost = Label(
 betaboost.grid(column=10, row=55)
 betaboost.configure(bg="ghostwhite")
 
-
-# -ALPHA UPGRADE 3 END
-
-
-# -BETA UPGRADE 1 START
 def milestones():
     global beta, milestoneamount, bcost1, milestonemaxmulti, milestoneincrease, betagenerationunlocked
     if beta > bcost1:
-        # -MILESTONE STUFF
+
         beta -= bcost1
         bcost1 = round((bcost1 * 9.5))
         bupg1.configure(text=str(bcost1) + " β")
@@ -358,7 +328,6 @@ def milestones():
     else:
         print("WARN: Not enough beta!")
 
-
 bupg1 = Label(window, text=str(bcost1) + " β")
 bupg1.grid(column=0, row=60)
 bupg1.configure(bg="ghostwhite")
@@ -381,12 +350,6 @@ milestonelabel = Label(
 milestonelabel.configure(bg="ghostwhite")
 milestonelabel.grid(column=10, row=65)
 
-
-# -BETA UPGRADE 1 END
-
-# -BETA UPGRADE 2 START
-
-
 def alphanizer():
     global beta, alpha, alphanizemulti, alphanizebetamulti, bcost2, alphanizerunlocked
     if beta >= bcost2:
@@ -403,7 +366,6 @@ def alphanizer():
             alphanizer_thread.start()
     else:
         print("WARN: Not enough beta.")
-
 
 alpherupg = Label(window, text=str(bcost2) + " β")
 alpherupg.grid(column=0, row=70)
@@ -427,11 +389,6 @@ alphanizeboostlabel = Label(
 alphanizeboostlabel.grid(column=10, row=75)
 alphanizeboostlabel.configure(bg="ghostwhite")
 
-
-# -BETA UPGRADE 2 END
-# -BETA ALPHANIZER START
-
-
 def alphanizemachine():
     global alphanizebetamulti, alphanizemulti, alphapower, gammabooster
     while alphanizerunlocked:
@@ -440,30 +397,21 @@ def alphanizemachine():
         alphanizemulti = 1 + (round(math.log2(math.sqrt(alphapower)), 2))
         time.sleep(0.1)
 
-
-# -BETA ALPHANIZER END
-
-
-# -BETA GENERATION START
 def betageneration():
     global beta, resetbeta, betagenerationunlocked
     while betagenerationunlocked:
         beta += round((resetbeta / 10))
         time.sleep(0.1)
 
-
-# -BETA GENERATION END
-
-# -Thread START
 alpha_thread = threading.Thread(target=update_alpha)
 alpha_thread.start()
 update_thread = threading.Thread(target=update)
 update_thread.start()
 betagenerationthread = threading.Thread(target=betageneration)
 alphanizer_thread = threading.Thread(target=alphanizemachine)
-# -Thread END
-
-# -SECOND WINDOW
+auto_save_thread = threading.Thread(target=auto_save_function)
+auto_save_thread.daemon = True
+auto_save_thread.start()
 
 new_window = tk.Toplevel(window)
 new_window.title("??? [3,000 Beta Required!]")
@@ -518,9 +466,6 @@ gammaupg3explain = tk.Label(new_window, text="???")
 gammaupg3explain.grid(column=20, row=30)
 gammaupg3explain.configure(bg="#C72EC7")
 
-
-# -RESET START
-
 def gammareset():
     global beta, alpha, max_alpha, gamma, resetgamma, baseincrease, basemaxalpha, a1buyamount, a2buyamount, up2multincrease, acost1, acost2, bcost1, bcost2
     global betamaxboost, betagenboost, rate, alphapower, alphanizerunlocked, milestoneincrease, milestonemaxmulti, milestoneamount, betagenerationunlocked, alphanizebetamulti, alphanizemulti
@@ -561,10 +506,6 @@ def gammareset():
             f"Beta boosts the generation by {betagenboost}x and max by {betamaxboost}"
         )
 
-
-# -RESET END
-
-# -GAMMA UPGRADE 1 START
 def gammaupg1():
     global gupg1, gamma, rate, g1buyamount, gammabooster
     if gamma >= gupg1:
@@ -575,11 +516,6 @@ def gammaupg1():
         g1buyamount += 1
     else:
         print("WARN: Not enough gamma!")
-
-
-# -GAMMA UPGRADE 1 END
-
-# -GAMMA UPGRADE 2 START
 
 def gammaupg2():
     global gupg2, gamma, g2buyamount, challengeactive, challengecompletions, beta, challengerequirement
@@ -611,7 +547,6 @@ def gammaupg2():
     else:
         print("WARN: Not enough gamma!")
 
-
 def challengechecker():
     global milestoneamount, challengerequirement, challengecompletions, challengeactive
     if challengeactive:
@@ -619,11 +554,6 @@ def challengechecker():
             challengerequirement += 1
             challengecompletions += 1
             time.sleep(1)
-
-
-# -GAMMA UPGRADE 2 END
-
-# -GAMMA UPGRADE 3 START
 
 def gammaupg3():
     global gamma, gupg3, challenge2active, deltaunlocked
@@ -645,11 +575,6 @@ def gammaupg3():
 
     else:
         print("WARN: Not enough gamma!")
-
-
-# -GAMMA UPGRADE 3 END
-
-# -DELTAIFY, THE NEW RESET LAYER!!
 
 deltalabel = tk.Label(new_window, text=f"...unworthy...")
 deltalabel.grid(column=0,row=40)
@@ -715,19 +640,7 @@ def deltaupg1():
         basemaxalpha = 500
         deltaalphabooster = 2
 
-
-
-
-# -DELTAIFY, THE NEW RESET LAYER ENDS...
-# THREADS 2 YAY START
-
 challenge_thread = threading.Thread(target=challengechecker)
-
-# THREADS 2 YAY END
-
-# SAVE STUFF, ALWAYS KEEP AT BOTTOM!!
-
-# -SAVE GAME STUFF IDK START
 
 savebutton = Button(window, text="Save", command=lambda: savecheckr())
 savebutton.grid(column=0, row=100)
@@ -740,10 +653,46 @@ saveentry.grid(column=10, row=100)
 loadentry = Entry(window, width=10)
 loadentry.grid(column=10, row=110)
 
+def savecheckr():
+    global filenamechoice, challengeactive, challenge2active
+    if challengeactive or challenge2active:
+        warnings.warn("WARN: Failure to save in challenge.")
+        status_message("Cannot save while in a challenge")
+    else:
+        if saveentry.get() == "":
+            warnings.warn("WARN: No save name entered.")
+            status_message("Please enter a save name")
+        else:
+            print(f"INFO: Save name entered. Saving {saveentry.get()}")
+            filenamechoice = saveentry.get()
+            save_variables_to_file()
+            status_message(f"Game saved as '{filenamechoice}'")
+
+def loadcheckr():
+    global filenamechoice, challengeactive, challenge2active
+    if challengeactive or challenge2active:
+        warnings.warn("WARN: Failure to load in challenge.")
+        status_message("Cannot load while in a challenge")
+    else:
+        if loadentry.get() == "":
+            warnings.warn("WARN: No load name entered.")
+            status_message("Please enter a save name to load")
+        else:
+            print(f"INFO: Load name entered. Loading {loadentry.get()}.")
+            filenamechoice = loadentry.get()
+            retrieve_variables_from_file()
+            status_message(f"Game loaded from '{filenamechoice}'")
+
+def status_message(message, duration=3000):
+    """Display a temporary status message at the bottom of the window"""
+    status_label = Label(window, text=message, fg="blue")
+    status_label.grid(column=0, row=200, columnspan=3)
+    window.after(duration, status_label.destroy)
 
 def save_variables_to_file():
+    """Save game variables to a file using base64 encoding for security"""
     if not filenamechoice:
-        print("WARN: No filename specified")
+        warnings.warn("WARN: No filename specified")
         return
 
     variables = [
@@ -770,103 +719,113 @@ def save_variables_to_file():
         f"deltaresetcomplete={deltaresetcomplete}", f"deltaupg1done={deltaupg1done}"
     ]
 
-    with open(f"saves/{filenamechoice}.txt", 'w') as f:
-        for i in range(0, len(variables), 10):
-            chunk = variables[i:i + 10]
-            f.write("{" + ",".join(chunk) + "}\n")
+    try:
 
+        data_string = "{" + ",".join(variables) + "}\n"
+        encoded_data = base64.b64encode(data_string.encode()).decode()
+
+        import os
+        os.makedirs("saves", exist_ok=True)  
+
+        with open(f"saves/{filenamechoice}.txt", 'w') as f:
+            f.write(encoded_data)
+
+        print(f"INFO: Game saved successfully to saves/{filenamechoice}.txt")
+    except Exception as e:
+        warnings.warn(f"WARN: Error saving game: {e}")
 
 def retrieve_variables_from_file():
+    """Load game variables from a file, decoding the base64 data"""
     if not filenamechoice:
-        print("WARN: No filename specified")
+        warnings.warn("WARN: No filename specified")
         return
-    global alpha, beta, gamma, baseincrease, up2multincrease, milestoneincrease
-    global alphanizemulti, alphanizebetamulti, gammabooster, challengerequirement
-    global challengecompletions, incre, incre2, incre3, incre4, increase
-    global milestonemaxmulti, alpmax, max_alpha, rate, alphapowerbooster
-    global alphapower, challengeactive, alphanizerunlocked, gammaifyunlocked, deltaalphabooster, deltabgbooster
-    global betagenerationunlocked, a1buyamount, a2buyamount, acost1, acost2, milestoneamount, bcost1, bcost2, g1buyamount, gupg1, g1buyamount, gupg2, g2buyamount
-    global betamaxboost, betamaxmulti, basemaxalpha, challengeunlocked, challenge2requirement, challenge2completions, deltaunlocked,deltaupg1done
 
-    with open(f"saves/{filenamechoice}.txt", 'r') as f:
-        lines = f.readlines()
-        for line in lines:
-            variables = line.strip()[1:-1].split(',')  # Remove { } and split
-            for var in variables:
-                if not var: continue
-                name, value = var.strip().split('=')
-                if value.lower() == 'true':
-                    value = True
-                elif value.lower() == 'false':
-                    value = False
-                else:
-                    try:
-                        value = float(value) if '.' in value else int(value)
-                    except ValueError:
-                        print(f"WARN: Could not convert {value} to number")
-                        continue
-                globals()[name] = value
+    try:
 
-        # Update UI elements after loading
-        progress_bar.configure(maximum=max_alpha)
-        alpha_label.config(
-            text=
-            f"Alpha: {alpha}/{max_alpha} , +{increase}α / {rate}s , Beta: {beta}β , {resetbeta}β/reset"
-        )
-        milestonelabel.configure(
-            text=
-            f"Your milestone boosts: {milestoneincrease}x α,  {milestonemaxmulti}x max α"
-        )
-        betaboost.configure(
-            text=
-            f"Beta boosts the generation by {betagenboost}x and max by {betamaxboost}x"
-        )
-        alphanizeboostlabel.configure(
-            text=f"Alphanizer boosts both multi by {alphanizemulti:.1f}")
+        with open(f"saves/{filenamechoice}.txt", 'r') as f:
+            encoded_data = f.read().strip()
+            decoded_data = base64.b64decode(encoded_data).decode()
+    except FileNotFoundError:
+        warnings.warn(f"WARN: Save file 'saves/{filenamechoice}.txt' not found")
+        return
+    except Exception as e:
+        warnings.warn(f"WARN: Error reading save file: {e}")
+        return
 
-        # Start threads based on boolean states
-        if betagenerationunlocked and not betagenerationthread.is_alive():
+    if decoded_data.startswith("{") and decoded_data.endswith("}"):
+        decoded_data = decoded_data[1:-1]
+    variables = decoded_data.split(",")
+
+    for var in variables:
+        if not var:
+            continue
+        try:
+            name, value = var.strip().split('=')
+            if value.lower() == 'true':
+                value = True
+            elif value.lower() == 'false':
+                value = False
+            else:
+                try:
+                    value = float(value) if '.' in value else int(value)
+                except ValueError:
+                    warnings.warn(f"WARN: Could not convert {value} to number")
+                    continue
+            globals()[name] = value
+        except Exception as e:
+            warnings.warn(f"WARN: Error processing variable {var}: {e}")
+
+    update_ui_after_load()
+
+def update_ui_after_load():
+    """Update all UI elements to reflect the loaded game state"""
+
+    progress_bar.configure(maximum=max_alpha)
+    alpha_label.config(
+        text=f"Alpha: {alpha}/{max_alpha} , +{increase}α / {rate}s , Beta: {beta}β , {resetbeta}β/reset"
+    )
+    milestonelabel.configure(
+        text=f"Your milestone boosts: {milestoneincrease}x α,  {milestonemaxmulti}x max α"
+    )
+    betaboost.configure(
+        text=f"Beta boosts the generation by {betagenboost}x and max by {betamaxboost}x"
+    )
+    alphanizeboostlabel.configure(
+        text=f"Alphanizer boosts both multi by {alphanizemulti:.1f}")
+
+    if betagenerationunlocked and 'betagenerationthread' in globals():
+        if not betagenerationthread.is_alive():
+            betagenerationthread = threading.Thread(target=beta_generation_function)
+            betagenerationthread.daemon = True
             betagenerationthread.start()
-        if alphanizerunlocked and not alphanizer_thread.is_alive():
+
+    if alphanizerunlocked and 'alphanizer_thread' in globals():
+        if not alphanizer_thread.is_alive():
+            alphanizer_thread = threading.Thread(target=alphanizer_function)
+            alphanizer_thread.daemon = True
             alphanizer_thread.start()
-        if gammaifyunlocked:
-            new_window.title("Gammaify!")
-            new_label.configure(text="Perform a gamma....")
-            new_button.configure(text=f"Perform a γ for {resetgamma}",
-                                 command=gammareset)
-            gammaup1label.configure(text=f"{gupg1} γ")
-            gammaup1button.configure(text=f"Buy ({g1buyamount})", command=gammaupg1)
-            gammaup1explain.configure(
-                text="Increases a delta multiplier by + 1.5x, boosts alpha and alpha power and lowers rate.")
 
+    if gammaifyunlocked:
+        new_window.title("Gammaify!")
+        new_window.deiconify()  
+        new_label.configure(text="Perform a gamma....")
+        new_button.configure(text=f"Perform a γ for {resetgamma}",
+                           command=gammareset)
+        gammaup1label.configure(text=f"{gupg1} γ")
+        gammaup1button.configure(text=f"Buy ({g1buyamount})", command=gammaupg1)
+        gammaup1explain.configure(
+            text="Increases a gamma multiplier by + 1.5x, boosts alpha and alpha power and lowers rate.")
 
-def savecheckr():
-    global filenamechoice, challengeactive, challenge2active
-    if challengeactive or challenge2active:
-        print("WARN: Failure to save in challenge.")
-    if not challengeactive or not challenge2active:
-        if saveentry.get() == "":
-            print("WARN: No save name entered.")
-        else:
-            print(f"INFO: Save name entered. Saving {saveentry.get()}")
-            filenamechoice = saveentry.get()
-            save_variables_to_file()
+def auto_save_function():
+    """Thread function to automatically save the game periodically"""
+    save_count = 0
+    while True:
+        time.sleep(1)
+        save_count += 1
+        if save_count >= 30:  
+            save_count = 0
+            if filenamechoice != "saves" and not (challengeactive or challenge2active):
+                print(f"INFO: Auto-saving game to {filenamechoice}")
+                save_variables_to_file()
 
-
-def loadcheckr():
-    global filenamechoice, challengeactive, challenge2active
-    if challengeactive or challenge2active:
-        print("WARN: Failure to load in challenge.")
-    if not challengeactive or not challenge2active:
-        if loadentry.get() == "":
-            print("WARN: No load name entered.")
-        else:
-            print(f"INFO: Load name entered. Loading {loadentry.get()}.")
-            filenamechoice = loadentry.get()
-            retrieve_variables_from_file()
-
-
-# -SAVE GAME STUFF IDK END
-
-# SAVE STUFF END!
 window.mainloop()
