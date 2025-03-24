@@ -2,9 +2,17 @@ IMPORTANT: This code uses a save function, which will use a save folder. When op
 
 Note: This uses python, and for me it works in pycharm, I'd reccomend using that or just anything else that can run python!
 
-This is the pichusymbolizers code made by mem @Pichuisthegreatest .
+This is the pichusymbolizers code made by me @Pichuisthegreatest .
 
-Current Version: 0.1.3.1
+Current Version: 0.1.3.2
+
+0.1.3.2: Deltaify Prerelease.
+
+-As of writing this, the code has not been commited, but the code is nearly ready and therefore it should be any time soon.
+-New Upgrades!
+-New Sub-reset layer
+-Automation???
+-please send me sleep my code is 1k lines long ON MAIN.PY ONLYYYY
 
 0.1.3.1: Deltaify starting, the reset layer itself.
 
