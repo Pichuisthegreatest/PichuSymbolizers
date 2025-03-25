@@ -409,9 +409,6 @@ update_thread = threading.Thread(target=update)
 update_thread.start()
 betagenerationthread = threading.Thread(target=betageneration)
 alphanizer_thread = threading.Thread(target=alphanizemachine)
-auto_save_thread = threading.Thread(target=auto_save_function)
-auto_save_thread.daemon = True
-auto_save_thread.start()
 
 new_window = tk.Toplevel(window)
 new_window.title("??? [3,000 Beta Required!]")
@@ -736,6 +733,18 @@ def save_variables_to_file():
 
 def retrieve_variables_from_file():
     """Load game variables from a file, decoding the base64 data"""
+    global alpha, beta, gamma, delta, basemaxalpha, betamaxmulti, \
+           acost1, acost2, bcost1, bcost2, a1buyamount, a2buyamount, \
+           milestoneamount, gupg1, g1buyamount, gupg2, baseincrease, \
+           up2multincrease, betamaxboost, milestoneincrease, alphanizemulti, \
+           alphanizebetamulti, gammabooster, challengerequirement, \
+           challengecompletions, challenge2completions, challenge2requirement, \
+           incre, incre2, incre3, incre4, increase, milestonemaxmulti, \
+           alpmax, max_alpha, rate, alphapowerbooster, alphapower, \
+           deltaalphabooster, deltabgbooster, challengeactive, \
+           alphanizerunlocked, gammaifyunlocked, betagenerationunlocked, \
+           challengeunlocked, deltaunlocked, deltaresetcomplete, deltaupg1done
+
     if not filenamechoice:
         warnings.warn("WARN: No filename specified")
         return
@@ -752,69 +761,42 @@ def retrieve_variables_from_file():
         warnings.warn(f"WARN: Error reading save file: {e}")
         return
 
-    if decoded_data.startswith("{") and decoded_data.endswith("}"):
-        decoded_data = decoded_data[1:-1]
-    variables = decoded_data.split(",")
+    decoded_data = decoded_data.strip('{}').strip()
 
-    for var in variables:
-        if not var:
-            continue
-        try:
-            name, value = var.strip().split('=')
+    try:
+
+        variables = [var.strip() for var in decoded_data.split(',')]
+
+        for var in variables:
+            if not var:
+                continue
+
+            parts = var.split('=', 1)
+            if len(parts) != 2:
+                warnings.warn(f"WARN: Skipping malformed variable: {var}")
+                continue
+
+            name, value = parts[0].strip(), parts[1].strip()
+
             if value.lower() == 'true':
                 value = True
             elif value.lower() == 'false':
                 value = False
             else:
                 try:
+
                     value = float(value) if '.' in value else int(value)
                 except ValueError:
-                    warnings.warn(f"WARN: Could not convert {value} to number")
-                    continue
+
+                    pass
+
             globals()[name] = value
-        except Exception as e:
-            warnings.warn(f"WARN: Error processing variable {var}: {e}")
 
-    update_ui_after_load()
+        print(f"INFO: Successfully loaded game state from {filenamechoice}")
+        status_message(f"Game loaded successfully from '{filenamechoice}'")
 
-def update_ui_after_load():
-    """Update all UI elements to reflect the loaded game state"""
-
-    progress_bar.configure(maximum=max_alpha)
-    alpha_label.config(
-        text=f"Alpha: {alpha}/{max_alpha} , +{increase}α / {rate}s , Beta: {beta}β , {resetbeta}β/reset"
-    )
-    milestonelabel.configure(
-        text=f"Your milestone boosts: {milestoneincrease}x α,  {milestonemaxmulti}x max α"
-    )
-    betaboost.configure(
-        text=f"Beta boosts the generation by {betagenboost}x and max by {betamaxboost}x"
-    )
-    alphanizeboostlabel.configure(
-        text=f"Alphanizer boosts both multi by {alphanizemulti:.1f}")
-
-    if betagenerationunlocked and 'betagenerationthread' in globals():
-        if not betagenerationthread.is_alive():
-            betagenerationthread = threading.Thread(target=beta_generation_function)
-            betagenerationthread.daemon = True
-            betagenerationthread.start()
-
-    if alphanizerunlocked and 'alphanizer_thread' in globals():
-        if not alphanizer_thread.is_alive():
-            alphanizer_thread = threading.Thread(target=alphanizer_function)
-            alphanizer_thread.daemon = True
-            alphanizer_thread.start()
-
-    if gammaifyunlocked:
-        new_window.title("Gammaify!")
-        new_window.deiconify()  
-        new_label.configure(text="Perform a gamma....")
-        new_button.configure(text=f"Perform a γ for {resetgamma}",
-                           command=gammareset)
-        gammaup1label.configure(text=f"{gupg1} γ")
-        gammaup1button.configure(text=f"Buy ({g1buyamount})", command=gammaupg1)
-        gammaup1explain.configure(
-            text="Increases a gamma multiplier by + 1.5x, boosts alpha and alpha power and lowers rate.")
+    except Exception as e:
+        warnings.warn(f"WARN: Error processing save file: {e}")
 
 def auto_save_function():
     """Thread function to automatically save the game periodically"""
@@ -827,5 +809,9 @@ def auto_save_function():
             if filenamechoice != "saves" and not (challengeactive or challenge2active):
                 print(f"INFO: Auto-saving game to {filenamechoice}")
                 save_variables_to_file()
+
+auto_save_thread = threading.Thread(target=auto_save_function)
+auto_save_thread.daemon = True
+auto_save_thread.start()
 
 window.mainloop()
